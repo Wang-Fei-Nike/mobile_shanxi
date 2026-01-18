@@ -377,16 +377,17 @@
             // 页面完全加载后
             window.addEventListener('load', function() {
                 console.log('页面完全加载完成');
-
-                // 隐藏加载动画（如果还在显示）
-                hideLoading();
-
-                // 最终检查所有图片状态
-                document.querySelectorAll('img').forEach(img => {
-                    if (!img.complete) {
-                        console.warn('图片可能未完成加载:', img.src);
-                    }
-                });
+            
+                // 隐藏加载动画
+                const loadingEl = document.getElementById('loadingPlaceholder');
+                if (loadingEl) {
+                    loadingEl.style.display = 'none';
+                }
+            
+                // 可选：记录图片加载状态（不警告）
+                const images = document.querySelectorAll('img');
+                const loadedImages = Array.from(images).filter(img => img.complete);
+                console.log(`图片加载统计: ${loadedImages.length}/${images.length}`);
             });
 
         }, { once: true }); // 确保只执行一次
@@ -394,3 +395,4 @@
 </body>
 
 </html>
+

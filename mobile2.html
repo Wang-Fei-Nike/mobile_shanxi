@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>首页</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'HarmonyOS Sans SC', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            position: relative;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* 华为鸿蒙/HMS浏览器安全区域适配 */
+        @supports (padding: max(0px)) {
+            body {
+                padding-top: max(env(safe-area-inset-top), 16px);
+                padding-bottom: max(env(safe-area-inset-bottom), 16px);
+                padding-left: max(env(safe-area-inset-left), 16px);
+                padding-right: max(env(safe-area-inset-right), 16px);
+            }
+        }
+
+        /* 主容器 - 适配华为 Mate 70 */
+        .main-container {
+            position: relative;
+            width: 100%;
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 10px;
+        }
+
+        /* 背景图片容器 */
+        .background-container {
+            position: relative;
+            width: 100%;
+            height: auto;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 6px 24px rgba(0,0,0,0.12);
+            background-color: white;
+            min-height: 720px; /* 适合Mate 70屏幕高度 */
+        }
+
+        /* 背景图片 */
+        .background-image {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: contain;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background-color: #ffffff; /* 加载前的背景色 */
+        }
+
+        /* 信息显示区域 */
+        .info-display {
+            position: absolute;
+            bottom: 20%;
+            left: 0;
+            width: 100%;
+            padding: 20px;
+            z-index: 3;
+            text-align: center;
+        }
+
+        /* 时间显示 */
+        .time-display {
+            position: absolute;
+            top: 40.5%;
+            right: 26.5%;
+            bottom: 12%;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #232324;
+            font-family: 'HarmonyOS Sans SC', -apple-system, BlinkMacSystemFont, 'Microsoft YaHei', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            z-index: 3;
+            text-align: center;
+            line-height: 1.5;
+            padding: 12px 24px;
+            border-radius: 12px;
+            width: auto;
+            white-space: nowrap;
+        }
+
+        /* 状态标签 */
+        .status-label {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #52c41a;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            z-index: 3;
+            box-shadow: 0 2px 8px rgba(82,196,26,0.3);
+        }
+
+        /* 华为 Mate 70 屏幕适配 */
+        @media screen and (min-width: 375px) and (max-width: 430px) {
+            .main-container {
+                max-width: 100%;
+                padding: 8px;
+            }
+
+            .background-container {
+                border-radius: 18px;
+                min-height: 680px;
+            }
+
+            .time-display {
+                font-size: 14px;
+            }
+
+            .status-label {
+                font-size: 13px;
+                padding: 6px 14px;
+            }
+        }
+
+        /* 小屏幕适配 */
+        @media (max-width: 374px) {
+            .background-container {
+                min-height: 600px;
+                border-radius: 16px;
+            }
+
+            .time-display {
+                font-size: 14px;
+                padding: 8px 16px;
+                bottom: 8%;
+            }
+
+            .status-label {
+                font-size: 12px;
+                padding: 5px 12px;
+                top: 15px;
+                right: 15px;
+            }
+        }
+
+        /* 大屏幕适配 */
+        @media (min-width: 431px) {
+            .main-container {
+                max-width: 430px;
+            }
+
+            .background-container {
+                min-height: 750px;
+                border-radius: 22px;
+            }
+
+            .time-display {
+                font-size: 14px;
+                padding: 14px 28px;
+                bottom: 15%;
+            }
+        }
+
+        /* 加载优化 */
+        .loading-placeholder {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            z-index: 10;
+            border-radius: inherit;
+            display: block;
+        }
+
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* 图片初始状态 */
+        img {
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        img.loaded {
+            opacity: 1;
+        }
+
+        /* 暗色模式 */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #121212;
+            }
+
+            .background-container {
+                background-color: #1e1e1e;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            }
+
+            .time-display {
+                color: #ffffff;
+                background: rgba(40,40,40,0.95);
+                box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+            }
+
+            .status-label {
+                background: #389e0d;
+                box-shadow: 0 2px 8px rgba(56,158,13,0.3);
+            }
+        }
+
+        /* 图片防拖拽和选择 */
+        img {
+            -webkit-user-drag: none;
+            user-drag: none;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+
+        /* 触摸反馈优化 */
+        .time-display:active,
+        .status-label:active {
+            transform: scale(0.98);
+            transition: transform 0.1s ease;
+        }
+
+        /* 华为浏览器特定优化 */
+        @supports (-webkit-touch-callout: none) {
+            .background-container {
+                -webkit-backface-visibility: hidden;
+                backface-visibility: hidden;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="background-container">
+            <!-- 加载占位符 -->
+            <div class="loading-placeholder" id="loadingPlaceholder"></div>
+
+            <!-- 背景图片 -->
+            <img
+                src="./compressed_bgk.png"
+                alt="访客审核通过页面"
+                class="background-image"
+                id="bgImage"
+            >
+
+
+            <!-- 信息显示区域 -->
+            <div class="info-display"></div>
+        </div>
+
+        <!-- 时间显示 -->
+        <div class="time-display" id="currentTime">正在加载时间...</div>
+    </div>
+
+    <script>
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('页面开始加载...');
+
+            // 图片加载计数器
+            let totalImages = 1; // 只剩背景图片
+            let loadedImages = 0;
+
+            // 显示加载动画
+            const loadingEl = document.getElementById('loadingPlaceholder');
+
+            // 获取图片元素
+            const bgImage = document.getElementById('bgImage');
+
+            // 1. 更新时间显示
+            function updateBeijingTime() {
+                try {
+                    const now = new Date();
+                    // 直接获取北京时间（UTC+8）
+                    const beijingTime = new Date(now.getTime() + (8 * 60 * 60 * 1000));
+
+                    const year = beijingTime.getUTCFullYear();
+                    const month = String(beijingTime.getUTCMonth() + 1).padStart(2, '0');
+                    const day = String(beijingTime.getUTCDate()).padStart(2, '0');
+                    const hours = String(beijingTime.getUTCHours()).padStart(2, '0');
+                    const minutes = String(beijingTime.getUTCMinutes()).padStart(2, '0');
+                    const seconds = String(beijingTime.getUTCSeconds()).padStart(2, '0');
+
+                    const timeDisplay = document.getElementById('currentTime');
+                    if (timeDisplay) {
+                        timeDisplay.textContent = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+                    }
+                } catch (error) {
+                    console.error('更新时间失败:', error);
+                    // 备用时间显示
+                    const timeDisplay = document.getElementById('currentTime');
+                    if (timeDisplay) {
+                        timeDisplay.textContent = new Date().toLocaleString('zh-CN');
+                    }
+                }
+            }
+
+            // 2. 图片加载完成处理
+            function handleImageLoad(img) {
+                img.classList.add('loaded');
+                loadedImages++;
+                console.log(`图片加载完成: ${img.src} (${loadedImages}/${totalImages})`);
+
+                // 检查是否所有图片都加载完成
+                if (loadedImages >= totalImages) {
+                    hideLoading();
+                }
+
+                // 如果图片加载特别快，检查是否需要隐藏loading
+                if (bgImage.complete) {
+                    setTimeout(hideLoading, 200);
+                }
+            }
+
+            // 3. 图片错误处理
+            function handleImageError(img) {
+                console.warn('图片加载失败:', img.src);
+                img.style.opacity = '0.7';
+                img.style.filter = 'grayscale(100%)';
+
+                // 标记为已加载（即使是错误的）
+                img.classList.add('loaded');
+                loadedImages++;
+
+                // 设置替代文本
+                if (img.alt) {
+                    img.title = '图片加载失败: ' + img.alt;
+                }
+
+                // 如果是背景图片错误，显示备用背景
+                if (img.id === 'bgImage') {
+                    img.style.backgroundColor = '#f0f0f0';
+                    img.style.opacity = '1';
+                }
+
+                // 检查是否所有图片都处理完成
+                if (loadedImages >= totalImages) {
+                    hideLoading();
+                }
+            }
+
+            // 4. 隐藏加载动画
+            function hideLoading() {
+                if (loadingEl && loadingEl.style.display !== 'none') {
+                    setTimeout(() => {
+                        loadingEl.style.opacity = '0';
+                        loadingEl.style.transition = 'opacity 0.5s ease';
+                        setTimeout(() => {
+                            loadingEl.style.display = 'none';
+                        }, 500);
+                    }, 200);
+                    console.log('隐藏加载动画');
+                }
+            }
+
+            // 5. 初始化图片加载监听
+            function initImageLoading() {
+                if (bgImage) {
+                    // 如果图片已经缓存完成
+                    if (bgImage.complete) {
+                        handleImageLoad(bgImage);
+                    } else {
+                        // 添加加载监听
+                        bgImage.addEventListener('load', function() {
+                            handleImageLoad(this);
+                        });
+
+                        // 添加错误监听
+                        bgImage.addEventListener('error', function() {
+                            handleImageError(this);
+                        });
+                    }
+                }
+
+                // 安全检查：如果图片已缓存完成
+                if (bgImage.complete) {
+                    setTimeout(hideLoading, 200);
+                }
+
+                // 超时保护：8秒后强制隐藏loading
+                setTimeout(function() {
+                    if (loadingEl && loadingEl.style.display !== 'none') {
+                        console.warn('图片加载超时，强制隐藏loading');
+                        hideLoading();
+                    }
+                }, 8000);
+            }
+
+            // 6. 设备检测和优化
+            function optimizeForHuawei() {
+                const ua = navigator.userAgent.toLowerCase();
+                const isHuawei = ua.includes('huawei') || ua.includes('harmony') || ua.includes('emui');
+                const width = window.innerWidth;
+                const height = window.innerHeight;
+                const isHighResolution = window.devicePixelRatio >= 2.5;
+
+                console.log('设备信息:', {
+                    isHuawei: isHuawei,
+                    screenSize: `${width}×${height}`,
+                    devicePixelRatio: window.devicePixelRatio,
+                    userAgent: ua.substring(0, 80)
+                });
+
+                // 华为设备优化
+                if (isHuawei) {
+                    // 添加华为设备类名
+                    document.body.classList.add('huawei-device');
+
+                    // 调整动画性能
+                    if (isHighResolution) {
+                        document.documentElement.style.setProperty('--animation-duration', '0.3s');
+                    }
+                }
+
+                // 检测横竖屏
+                function checkOrientation() {
+                    const isPortrait = window.innerHeight > window.innerWidth;
+                    document.body.classList.toggle('portrait', isPortrait);
+                    document.body.classList.toggle('landscape', !isPortrait);
+                }
+
+                window.addEventListener('resize', checkOrientation);
+                checkOrientation();
+            }
+
+            // 7. 初始化所有功能
+            function init() {
+                console.log('开始初始化...');
+
+                // 华为设备优化
+                optimizeForHuawei();
+
+                // 初始化图片加载监听
+                initImageLoading();
+
+                // 立即显示时间
+                updateBeijingTime();
+
+                // 开始时间更新循环
+                setInterval(updateBeijingTime, 1000);
+
+                console.log('初始化完成');
+            }
+
+            // 启动初始化
+            setTimeout(init, 50);
+
+            // 全局错误处理
+            window.addEventListener('error', function(e) {
+                console.error('页面错误:', e.message, 'at', e.filename, 'line', e.lineno);
+                return false;
+            });
+
+            // 页面完全加载后
+            window.addEventListener('load', function() {
+                console.log('页面完全加载完成');
+
+                // 最终安全检查
+                setTimeout(function() {
+                    if (loadingEl && loadingEl.style.display !== 'none') {
+                        console.log('强制完成加载');
+                        hideLoading();
+                    }
+                }, 1500);
+            });
+
+        }, { once: true });
+    </script>
+</body>
+</html>

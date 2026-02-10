@@ -25,15 +25,19 @@
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+            /* Mate 70 屏幕适配 */
+            width: 100vw;
+            height: 100vh;
+            overscroll-behavior: none;
         }
 
         /* 华为鸿蒙/HMS浏览器安全区域适配 */
         @supports (padding: max(0px)) {
             body {
-                padding-top: max(env(safe-area-inset-top), 16px);
-                padding-bottom: max(env(safe-area-inset-bottom), 16px);
-                padding-left: max(env(safe-area-inset-left), 16px);
-                padding-right: max(env(safe-area-inset-right), 16px);
+                padding-top: max(env(safe-area-inset-top), 20px);
+                padding-bottom: max(env(safe-area-inset-bottom), 20px);
+                padding-left: max(env(safe-area-inset-left), 20px);
+                padding-right: max(env(safe-area-inset-right), 20px);
             }
         }
 
@@ -43,7 +47,13 @@
             width: 100%;
             max-width: 100%;
             margin: 0 auto;
-            padding: 10px;
+            padding: 0;
+            /* 基于Mate 70屏幕比例调整 */
+            aspect-ratio: 1216/2688; /* 高度/宽度，这里实际上应该是反的 */
+            max-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
         /* 背景图片容器 */
@@ -51,11 +61,14 @@
             position: relative;
             width: 100%;
             height: auto;
-            border-radius: 20px;
+            border-radius: 40px; /* 更大圆角适配曲面屏 */
             overflow: hidden;
-            box-shadow: 0 6px 24px rgba(0,0,0,0.12);
+            box-shadow: 0 12px 48px rgba(0,0,0,0.15); /* 加强阴影效果 */
             background-color: white;
-            min-height: 720px; /* 适合Mate 70屏幕高度 */
+            /* 移除固定高度，使用自适应 */
+            aspect-ratio: 9/19.5; /* 近似Mate 70的屏幕比例 */
+            max-height: 90vh; /* 确保不超出可视区域 */
+            margin: 0 auto;
         }
 
         /* 背景图片 */
@@ -63,17 +76,18 @@
             width: 100%;
             height: 100%;
             display: block;
-            object-fit: contain;
+            object-fit: cover; /* 改为cover以完全填充容器 */
             position: absolute;
             top: 0;
             left: 0;
             background-color: #ffffff; /* 加载前的背景色 */
+            border-radius: inherit;
         }
 
         /* 信息显示区域 */
         .info-display {
             position: absolute;
-            bottom: 20%;
+            bottom: 22%; /* 调整位置 */
             left: 0;
             width: 100%;
             padding: 20px;
@@ -84,77 +98,182 @@
         /* 时间显示 */
         .time-display {
             position: absolute;
-            top: 40.5%;
-            right: 38.5%;
-            bottom: 12%;
-            left: 50%;
+            top: 41%; /* 精确调整位置 */
+            right: auto; /* 移除右侧定位 */
+            bottom: auto;
+            left: 65%;
             transform: translateX(-50%);
             color: #232324;
             font-family: 'HarmonyOS Sans SC', -apple-system, BlinkMacSystemFont, 'Microsoft YaHei', sans-serif;
-            font-size: 14px;
+            font-size: 16px; /* 增大字体 */
             font-weight: 600;
             z-index: 3;
             text-align: center;
-            line-height: 1.5;
-            /* 移除以下边框/背景相关样式 */
-            /* padding: 12px 24px; */
-            /* border-radius: 12px; */
+            line-height: 1.2;
             width: auto;
             white-space: nowrap;
-            /* 添加透明背景确保无框 */
             background: transparent;
             box-shadow: none;
             border: none;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.1); /* 添加文字阴影增强可读性 */
+            letter-spacing: 0.5px; /* 字间距优化 */
         }
 
         /* 状态标签 */
         .status-label {
             position: absolute;
-            top: 20px;
-            right: 20px;
+            top: 30px; /* 调整位置适应状态栏 */
+            right: 30px;
             background: #52c41a;
             color: white;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 14px;
+            padding: 10px 20px; /* 增大内边距 */
+            border-radius: 25px; /* 更大圆角 */
+            font-size: 15px; /* 增大字体 */
             font-weight: 600;
             z-index: 3;
-            box-shadow: 0 2px 8px rgba(82,196,26,0.3);
+            box-shadow: 0 4px 16px rgba(82,196,26,0.3);
+            backdrop-filter: blur(10px); /* 毛玻璃效果 */
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
         }
 
-        /* 华为 Mate 70 屏幕适配 */
-        @media screen and (min-width: 375px) and (max-width: 430px) {
+        /* ========== 华为 Mate 70 专门优化 ========== */
+        @media screen and (width: 2688px) and (height: 1216px),
+               screen and (width: 1216px) and (height: 2688px),
+               screen and (min-width: 1200px) and (min-height: 2600px) {
+
+            body {
+                padding-top: max(env(safe-area-inset-top), 30px);
+                padding-bottom: max(env(safe-area-inset-bottom), 30px);
+                padding-left: max(env(safe-area-inset-left), 30px);
+                padding-right: max(env(safe-area-inset-right), 30px);
+            }
+
             .main-container {
                 max-width: 100%;
-                padding: 8px;
+                padding: 0;
+                aspect-ratio: 1216/2688;
             }
 
             .background-container {
-                border-radius: 18px;
-                min-height: 680px;
+                border-radius: 50px; /* 超大圆角适配曲面屏 */
+                aspect-ratio: 9/19.5;
+                box-shadow: 0 20px 80px rgba(0,0,0,0.2);
+                max-width: 95vw; /* 留出边距 */
+                max-height: 95vh;
+            }
+
+            .time-display {
+                font-size: 18px; /* Mate 70上更大字体 */
+                top: 41.5%;
+                text-shadow: 0 2px 4px rgba(0,0,0,0.15);
+                letter-spacing: 1px;
+            }
+
+            .status-label {
+                top: 40px;
+                right: 40px;
+                padding: 12px 24px;
+                font-size: 16px;
+                border-radius: 28px;
+            }
+
+            /* 优化图片显示 */
+            .background-image {
+                object-fit: cover;
+            }
+        }
+
+        /* 横屏适配 */
+        @media screen and (orientation: landscape) and (min-width: 1216px) {
+            .main-container {
+                aspect-ratio: 2688/1216; /* 横屏比例 */
+            }
+
+            .background-container {
+                aspect-ratio: 19.5/9; /* 横屏比例 */
+                max-width: 90vw;
+                max-height: 85vh;
+            }
+
+            .time-display {
+                top: 45%;
+                font-size: 20px;
+            }
+
+            .status-label {
+                top: 25px;
+                right: 25px;
+            }
+        }
+
+        /* 竖屏适配 */
+        @media screen and (orientation: portrait) and (min-height: 2600px) {
+            .main-container {
+                aspect-ratio: 1216/2688;
+            }
+
+            .background-container {
+                aspect-ratio: 9/19.5;
+                max-width: 85vw;
+                max-height: 90vh;
+            }
+
+            .time-display {
+                top: 41%;
+                font-size: 17px;
+            }
+        }
+
+        /* 中屏幕适配 (适用于折叠屏展开状态等) */
+        @media screen and (min-width: 768px) and (max-width: 1199px) {
+            .background-container {
+                border-radius: 30px;
+                aspect-ratio: 9/18;
+            }
+
+            .time-display {
+                font-size: 15px;
+                top: 40%;
+            }
+
+            .status-label {
+                font-size: 14px;
+                padding: 8px 16px;
+            }
+        }
+
+        /* 小屏幕适配 */
+        @media (max-width: 767px) {
+            .background-container {
+                border-radius: 25px;
+                aspect-ratio: 9/16;
+                max-height: 85vh;
             }
 
             .time-display {
                 font-size: 14px;
+                top: 40%;
             }
 
             .status-label {
                 font-size: 13px;
                 padding: 6px 14px;
+                top: 20px;
+                right: 20px;
             }
         }
 
-        /* 小屏幕适配 */
+        /* 超小屏幕适配 */
         @media (max-width: 374px) {
             .background-container {
-                min-height: 600px;
-                border-radius: 16px;
+                border-radius: 20px;
+                aspect-ratio: 9/18;
             }
 
             .time-display {
-                font-size: 14px;
-                padding: 8px 16px;
-                bottom: 8%;
+                font-size: 13px;
+                top: 39%;
             }
 
             .status-label {
@@ -162,24 +281,6 @@
                 padding: 5px 12px;
                 top: 15px;
                 right: 15px;
-            }
-        }
-
-        /* 大屏幕适配 */
-        @media (min-width: 431px) {
-            .main-container {
-                max-width: 430px;
-            }
-
-            .background-container {
-                min-height: 750px;
-                border-radius: 22px;
-            }
-
-            .time-display {
-                font-size: 14px;
-                padding: 14px 28px;
-                bottom: 15%;
             }
         }
 
@@ -221,38 +322,20 @@
 
             .background-container {
                 background-color: #1e1e1e;
-                box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-            }
-
-        /* 暗色模式 */
-        @media (prefers-color-scheme: dark) {
-            body {
-                background-color: #121212;
-            }
-
-            .background-container {
-                background-color: #1e1e1e;
-                box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+                box-shadow: 0 8px 32px rgba(0,0,0,0.4);
             }
 
             .time-display {
                 color: #ffffff;
-                /* 移除暗色模式的背景和阴影 */
-                /* background: rgba(40,40,40,0.95); */
-                /* box-shadow: 0 4px 16px rgba(0,0,0,0.3); */
                 background: transparent;
                 box-shadow: none;
+                text-shadow: 0 2px 4px rgba(0,0,0,0.3);
             }
 
             .status-label {
                 background: #389e0d;
-                box-shadow: 0 2px 8px rgba(56,158,13,0.3);
-            }
-        }
-
-            .status-label {
-                background: #389e0d;
-                box-shadow: 0 2px 8px rgba(56,158,13,0.3);
+                box-shadow: 0 4px 16px rgba(56,158,13,0.3);
+                border: 1px solid rgba(56,158,13,0.2);
             }
         }
 
@@ -278,6 +361,26 @@
             .background-container {
                 -webkit-backface-visibility: hidden;
                 backface-visibility: hidden;
+            }
+        }
+
+        /* 高DPI屏幕优化 */
+        @media (-webkit-min-device-pixel-ratio: 2.5), (min-resolution: 240dpi) {
+            .time-display {
+                -webkit-font-smoothing: subpixel-antialiased;
+                font-weight: 500;
+            }
+
+            .background-image {
+                image-rendering: -webkit-optimize-contrast;
+                image-rendering: crisp-edges;
+            }
+        }
+
+        /* 折叠屏优化 */
+        @supports (fold: 1) {
+            .background-container {
+                border-radius: 30px;
             }
         }
     </style>
@@ -439,42 +542,60 @@
                 }, 8000);
             }
 
-            // 6. 设备检测和优化
-            function optimizeForHuawei() {
-                const ua = navigator.userAgent.toLowerCase();
-                const isHuawei = ua.includes('huawei') || ua.includes('harmony') || ua.includes('emui');
-                const width = window.innerWidth;
-                const height = window.innerHeight;
-                const isHighResolution = window.devicePixelRatio >= 2.5;
+        // 6. 设备检测和优化
+        function optimizeForHuawei() {
+            const ua = navigator.userAgent.toLowerCase();
+            const isHuawei = ua.includes('huawei') || ua.includes('harmony') || ua.includes('emui');
+            const isMate70 = window.innerWidth === 2688 && window.innerHeight === 1216 ||
+                            window.innerWidth === 1216 && window.innerHeight === 2688;
 
-                console.log('设备信息:', {
-                    isHuawei: isHuawei,
-                    screenSize: `${width}×${height}`,
-                    devicePixelRatio: window.devicePixelRatio,
-                    userAgent: ua.substring(0, 80)
-                });
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            const isHighResolution = window.devicePixelRatio >= 2.5;
 
-                // 华为设备优化
-                if (isHuawei) {
-                    // 添加华为设备类名
-                    document.body.classList.add('huawei-device');
+            console.log('设备信息:', {
+                isHuawei: isHuawei,
+                isMate70: isMate70,
+                screenSize: `${width}×${height}`,
+                devicePixelRatio: window.devicePixelRatio,
+                userAgent: ua.substring(0, 80)
+            });
 
-                    // 调整动画性能
-                    if (isHighResolution) {
-                        document.documentElement.style.setProperty('--animation-duration', '0.3s');
-                    }
+            // 华为设备优化
+            if (isHuawei) {
+                document.body.classList.add('huawei-device');
+
+                // Mate 70 特殊优化
+                if (isMate70) {
+                    document.body.classList.add('huawei-mate70');
+                    console.log('检测到华为Mate 70，启用专属优化');
                 }
 
-                // 检测横竖屏
-                function checkOrientation() {
-                    const isPortrait = window.innerHeight > window.innerWidth;
-                    document.body.classList.toggle('portrait', isPortrait);
-                    document.body.classList.toggle('landscape', !isPortrait);
+                // 调整动画性能
+                if (isHighResolution) {
+                    document.documentElement.style.setProperty('--animation-duration', '0.3s');
                 }
-
-                window.addEventListener('resize', checkOrientation);
-                checkOrientation();
             }
+
+            // 检测横竖屏
+            function checkOrientation() {
+                const isPortrait = window.innerHeight > window.innerWidth;
+                const isMate70Portrait = isMate70 && isPortrait;
+                const isMate70Landscape = isMate70 && !isPortrait;
+
+                document.body.classList.toggle('portrait', isPortrait);
+                document.body.classList.toggle('landscape', !isPortrait);
+                document.body.classList.toggle('mate70-portrait', isMate70Portrait);
+                document.body.classList.toggle('mate70-landscape', isMate70Landscape);
+
+                if (isMate70) {
+                    console.log(`Mate 70 ${isPortrait ? '竖屏' : '横屏'}模式: ${width}×${height}`);
+                }
+            }
+
+            window.addEventListener('resize', checkOrientation);
+            checkOrientation();
+        }
 
             // 7. 初始化所有功能
             function init() {
@@ -520,5 +641,4 @@
         }, { once: true });
     </script>
 </body>
-
 </html>

@@ -96,10 +96,15 @@
             z-index: 3;
             text-align: center;
             line-height: 1.5;
-            padding: 12px 24px;
-            border-radius: 12px;
+            /* 移除以下边框/背景相关样式 */
+            /* padding: 12px 24px; */
+            /* border-radius: 12px; */
             width: auto;
             white-space: nowrap;
+            /* 添加透明背景确保无框 */
+            background: transparent;
+            box-shadow: none;
+            border: none;
         }
 
         /* 状态标签 */
@@ -219,11 +224,31 @@
                 box-shadow: 0 4px 20px rgba(0,0,0,0.3);
             }
 
+        /* 暗色模式 */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #121212;
+            }
+
+            .background-container {
+                background-color: #1e1e1e;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            }
+
             .time-display {
                 color: #ffffff;
-                background: rgba(40,40,40,0.95);
-                box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+                /* 移除暗色模式的背景和阴影 */
+                /* background: rgba(40,40,40,0.95); */
+                /* box-shadow: 0 4px 16px rgba(0,0,0,0.3); */
+                background: transparent;
+                box-shadow: none;
             }
+
+            .status-label {
+                background: #389e0d;
+                box-shadow: 0 2px 8px rgba(56,158,13,0.3);
+            }
+        }
 
             .status-label {
                 background: #389e0d;
